@@ -3,7 +3,9 @@ interface Props {
 	title: string;
 }
 
-const { title } = Astro.props;
+import { ViewTransitions } from 'astro:transitions';
+const { frontmatter, title} = Astro.props
+
 ---
 
 <!doctype html>
@@ -14,15 +16,32 @@ const { title } = Astro.props;
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
+		<meta name='description' content={frontmatter?.description ? frontmatter.description : 'My awesome blog'} />
+		<meta property="og:image" content={`https://mywebsite.com/my-image.png`}
+/>
 		<title>{title}</title>
+		<link rel="alternate" type="application/rss+xml" title="My cool blog" href="/rss.xml"/>
+		<ViewTransitions />
 	</head>
-	<body>
+	<body class='p-5'>
+	{
+      Astro.url.pathname !== '/' && (
+        <p class='py-4'>
+        	<a class='underline' href={'/'}>
+        		◀︎ Back to the homepage
+        	</a>
+        </p>
+      	)
+    	}
+		{frontmatter?.title && <h1>{frontmatter.title}</h1>}	
 		<slot />
 	</body>
 </html>
+
+
 <style is:global>
 	:root {
-		--accent: 136, 58, 234;
+		--accent: 136, 58, 234; 
 		--accent-light: 224, 204, 250;
 		--accent-dark: 49, 10, 101;
 		--accent-gradient: linear-gradient(
@@ -31,12 +50,54 @@ const { title } = Astro.props;
 			rgb(var(--accent-light)) 30%,
 			white 60%
 		);
+		--highlight-yellow: #fdff32;
 	}
 	html {
 		font-family: system-ui, sans-serif;
 		background: #13151a;
 		background-size: 224px;
+		color:rgb(var(--accent))
 	}
+	h1 {
+		font-size: 3rem;
+		font-weight: bold;
+		border-bottom: 3px solid yellow;
+	}
+	h2 {
+		font-size: 2.5em;
+	}
+	h3 {
+		font-size: 2em;
+	}
+	p {
+		color: (rgb(var(--accent)));
+	}
+	strong {
+		font-weight: 600;
+	}
+	mark { 
+		background-color:var(--highlight-yellow);
+		color: black;
+	}
+	mark::before,
+	mark::after {
+  		clip-path: inset(100%);
+  		clip: rect(1px, 1px, 1px, 1px);
+  		height: 1px;
+  		overflow: hidden;
+  		position: absolute;
+  		white-space: nowrap;
+  		width: 1px;
+	}	
+	mark::before {
+  		content: " [highlight start] ";
+	}
+	mark::after {
+  		content: " [highlight end] ";
+	}
+	img {
+		max-width: 50%;
+	}	
 	code {
 		font-family:
 			Menlo,
